@@ -124,6 +124,8 @@ class NuPlugin(abc.ABC):
         if key == "Filesize":
             return FileSize(value["val"])
         if key == "Date":
+            if value["val"].endswith("+2359"):
+                return datetime.date.fromisoformat(re.sub("T.+", "", value["val"]))
             return datetime.datetime.fromisoformat(
                 re.sub(r"\.(\d{6})\d*", r".\1", value["val"])
             )
@@ -176,6 +178,11 @@ class NuPlugin(abc.ABC):
         elif isinstance(obj, datetime.datetime):
             key = "Date"
             value = {"val": obj.isoformat()}
+        elif isinstance(obj, datetime.date):
+            key = "Date"
+            # avoid "Plugin failed to encode: input is not enough for unique date and time"
+            # use an unusual offset to make it identifiable as a date
+            value = {"val": obj.isoformat() + "T00:00:00+2359"}
         elif isinstance(obj, bytes):
             key = "Binary"
             value = {"val": list(obj)}
