@@ -151,7 +151,7 @@ class NuPlugin(abc.ABC):
     def decode_custom(self, key, value):
         return NushellObject(key, value)
 
-    def encode(self, obj):
+    def encode(self, obj, *, from_encode_custom=False):
         if obj is None:
             key = "Nothing"
             value = {"val": None}
@@ -204,11 +204,11 @@ class NuPlugin(abc.ABC):
             key = obj.key
             value = obj.value
         else:
-            key, value = self.encode_custom(obj)
+            key, value = self.encode_custom(obj, _is_cycle=from_encode_custom)
         value["internal_span"] = self._head_span
         return {key: value}
 
-    def encode_custom(self, obj):
+    def encode_custom(self, obj, *, _is_cycle=False):
         raise RuntimeError(f"Unhandled Python type: {type(obj)}")
 
     @staticmethod
