@@ -203,7 +203,7 @@ class NuPlugin(abc.ABC):
             value = obj.value
         else:
             key, value = self.encode_custom(obj)
-        value["span"] = self._head_span
+        value["internal_span"] = self._head_span
         return {key: value}
 
     def encode_custom(self, obj):
@@ -259,7 +259,7 @@ class NuPlugin(abc.ABC):
             "Error": {
                 "label": "ERROR from Python plugin",
                 "msg": message,
-                "span": self._head_span,
+                "internal_span": self._head_span,
             }
         }
 
