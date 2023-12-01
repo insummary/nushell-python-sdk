@@ -131,8 +131,8 @@ class NuPlugin(abc.ABC):
             return [self.decode(item) for item in value["vals"]]
         if key == "Record":
             return {
-                value["cols"][index]: self.decode(value["vals"][index])
-                for index in range(len(value["cols"]))
+                value["val"]["cols"][index]: self.decode(value["val"]["vals"][index])
+                for index in range(len(value["val"]["cols"]))
             }
         if key == "Duration":
             return timedelta(microseconds=value["val"] / 1000)
@@ -154,7 +154,7 @@ class NuPlugin(abc.ABC):
     def encode(self, obj):
         if obj is None:
             key = "Nothing"
-            value = {}
+            value = {"val": None}
         elif isinstance(obj, bool):
             key = "Bool"
             value = {"val": obj}
@@ -182,8 +182,10 @@ class NuPlugin(abc.ABC):
         elif isinstance(obj, Mapping):
             key = "Record"
             value = {
-                "cols": list(obj.keys()),
-                "vals": [self.encode(obj[key]) for key in obj.keys()],
+                "val": {
+                    "cols": list(obj.keys()),
+                    "vals": [self.encode(obj[key]) for key in obj.keys()],
+                }
             }
         elif isinstance(obj, Sequence):
             key = "List"
